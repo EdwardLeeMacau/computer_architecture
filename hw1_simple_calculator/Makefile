@@ -26,10 +26,9 @@ test: r11922001.s
 	@echo "Testing ..."
 	@echo ""
 	$(Q)$(foreach file, $(wildcard tests/*.in), \
-		$(JUPITER) $< < $(file) > $(file:.in=.out); \
-		$(DIFF) $(file:.in=.out) $(file:.in=.ans); \
+		echo $(file); \
+		$(JUPITER) $< < $(file) > $(file:.in=.out) && $(DIFF) $(file:.in=.out) $(file:.in=.ans); \
 	)
-	$(Q)$(JUPITER)
 
 .PHONY: clean
 clean:
