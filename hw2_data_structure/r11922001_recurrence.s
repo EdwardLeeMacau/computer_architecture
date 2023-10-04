@@ -10,8 +10,8 @@ __start:
 
 output:
     # Output the result
+    mv a1, a0
     li a0, 1
-    mv a1, s0
     ecall
 
 exit:
@@ -31,17 +31,18 @@ recurrence:
     #
     # returns:
     #   a0: T(n)
-    addi t0, zero, 2
-    bgt s0, t0, loop # if s0 >= 2, do recurrence
+    addi t0, zero, 1
+    bgt s0, t0, loop # if s0 > 1, do recurrence
     mv a0, s0
-    jr ra
+    ret
 
 loop:
-    # allocate 8 bytes from stack
-    addi sp, sp, -8
-    # store s0 and s1 to stack
-    sw s0, 4(sp)
-    sw s1, 0(sp)
+    # allocate 12 bytes from stack
+    addi sp, sp, -12
+    # store s0, s1 and ra to stack
+    sw ra, 8(sp)
+    sw s1, 4(sp)
+    sw s0, 0(sp)
     # calculate T(n - 1)
     addi s0, s0, -1
     jal ra, recurrence
@@ -51,8 +52,10 @@ loop:
     addi s0, s0, -1
     jal ra, recurrence
     add a0, a0, s1
-    # restore s0 and s1 from stack
-    lw s0, 4(sp)
-    lw s1, 0(sp)
-    addi sp, sp, 8
-    jr ra
+    # restore s0, s1 and ra from stack
+    lw ra, 8(sp)
+    lw s1, 4(sp)
+    lw s0, 0(sp)
+    # free 8 bytes from stack
+    addi sp, sp, 12
+    ret

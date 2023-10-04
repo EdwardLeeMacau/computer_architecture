@@ -13,6 +13,8 @@ CX = g++
 DIFF = diff
 JUPITER = $(JUPITER_ROOT)/jupiter
 
+CLEAN_BINS := recurrence linkedlist
+
 ################################################################################
 # Specify compile options
 ################################################################################
@@ -38,11 +40,11 @@ test_linkedlist: r11922001_linkedlist.s
 
 test_recurrence test_linkedlist:
 	@echo "Testing $(subst test_,,$@) ..."
-	@echo ""
 	$(Q)$(foreach file, $(wildcard tests_$(subst test_,,$@)/*.in), \
-		echo $(file); \
+		echo "> $(notdir $(basename $(file)))"; \
 		$(JUPITER) $< < $(file) > $(file:.in=.out) && $(DIFF) $(file:.in=.out) $(file:.in=.ans); \
 	)
+	@echo ""
 
 ################################################################################
 # Specify the PHONY targets
@@ -58,7 +60,7 @@ test: test_recurrence test_linkedlist
 clean:
 	@echo "Cleaning up ..."
 	@echo ""
-	$(Q)$(RM) $(wildcard tests/*.out)
+	$(Q)$(RM) $(wildcard tests/*.out) $(CLEAN_BINS)
 
 .PHONY: help
 help:

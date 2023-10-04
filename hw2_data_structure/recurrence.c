@@ -7,7 +7,12 @@
 
 void help(char *prog)
 {
-    printf("Usage: %s <n>\n", prog);
+    printf(
+        "Usage:\n"
+        "  %s <n>\n"
+        "\n"
+        "Options:\n"
+        "  <n>    the index of the term to be computed\n", prog);
     exit(1);
 }
 
