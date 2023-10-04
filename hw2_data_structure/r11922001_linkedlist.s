@@ -38,10 +38,30 @@ LBB0_2:
         ret
 
 print_list:
+        ### if a0 == NULL return ###
+        beqz    a0, print_list_end
+        ### save ra, s0 ###
+        addi    sp, sp, -16
+        sw      ra, 12(sp)
+        sw      s0, 8(sp)
+        mv      s0, a0
+        ### a0 = a0->head ###
+        lw      a0, 4(a0)
+        ### print_list
+        call    print_list
+        ### print_int(a0->value) ###
+        lw      a0, 0(s0)
+        call    print_int
+        ### restore ra, s0 ###
+        lw      ra, 12(sp)
+        lw      s0, 8(sp)
+        addi    sp, sp, 16
+
+print_list_end:
         ret
 
 __start:
-        ### save ra、s0 ###
+        ### save ra, s0 ###
         addi    sp, sp, -16
         sw      ra, 12(sp)
         sw      s0, 8(sp)
