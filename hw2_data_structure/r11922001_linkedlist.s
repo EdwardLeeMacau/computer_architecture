@@ -72,6 +72,7 @@ __start:
         ### if(nums <= 0) exit
         mv      s0, a0
         blez    a0, exit
+        sw      x0, 0(sp)
 LBB2_1:
         call    read_int
         ### set push_front_list argument ###
