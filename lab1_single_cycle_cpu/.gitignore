@@ -1,3 +1,10 @@
 # Environment
 peco
 
+# Build Target
+cpu
+
+# Dump files
+*.txt
+*.vcd
+
