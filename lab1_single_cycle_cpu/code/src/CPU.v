@@ -1,6 +1,6 @@
 module CPU
 (
-    clk_i, 
+    clk_i,
     rst_i,
 );
 
@@ -28,7 +28,7 @@ MUX32 MUX_ALUSrc(
 
 Sign_Extend Sign_Extend(
 );
-  
+
 ALU ALU(
 );
 

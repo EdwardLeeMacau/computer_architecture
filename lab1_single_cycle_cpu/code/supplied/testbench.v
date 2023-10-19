@@ -1,4 +1,4 @@
-`define CYCLE_TIME 50            
+`define CYCLE_TIME 50
 
 module TestBench;
 
@@ -6,45 +6,45 @@ reg                Clk;
 reg                Reset;
 integer            i, outfile, counter;
 
-always #(`CYCLE_TIME/2) Clk = ~Clk;    
+always #(`CYCLE_TIME/2) Clk = ~Clk;
 
 CPU CPU(
     .clk_i  (Clk),
     .rst_i  (Reset)
 );
-  
+
 initial begin
     $dumpfile("waveform.vcd");
     $dumpvars;
 
     counter = 0;
-    
+
     // initialize instruction memory
     for(i=0; i<256; i=i+1) begin
         CPU.Instruction_Memory.memory[i] = 32'b0;
     end
-    
+
     // Load instructions into instruction memory
     $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
-    
+
     // Open output file
     outfile = $fopen("output.txt") | 1;
 
     Clk = 0;
     Reset = 0;
-    
-    #(`CYCLE_TIME/4) 
+
+    #(`CYCLE_TIME/4)
     Reset = 1;
-    
+
 end
-  
+
 always@(posedge Clk) begin
     if(counter == 30)    // stop after 30 cycles
         $finish;
-        
+
     // print PC
     $fdisplay(outfile, "PC = %d", CPU.PC.pc_o);
-    
+
     // print Registers
     $fdisplay(outfile, "Registers");
     $fdisplay(outfile, "x0     = %d, x8(s0)  = %d, x16(a6) = %d, x24(s8)  = %d", CPU.Registers.register[0], CPU.Registers.register[8] , CPU.Registers.register[16], CPU.Registers.register[24]);
@@ -55,11 +55,11 @@ always@(posedge Clk) begin
     $fdisplay(outfile, "x5(t0) = %d, x13(a3) = %d, x21(s5) = %d, x29(t4)  = %d", CPU.Registers.register[5], CPU.Registers.register[13], CPU.Registers.register[21], CPU.Registers.register[29]);
     $fdisplay(outfile, "x6(t1) = %d, x14(a4) = %d, x22(s6) = %d, x30(t5)  = %d", CPU.Registers.register[6], CPU.Registers.register[14], CPU.Registers.register[22], CPU.Registers.register[30]);
     $fdisplay(outfile, "x7(t2) = %d, x15(a5) = %d, x23(s7) = %d, x31(t6)  = %d", CPU.Registers.register[7], CPU.Registers.register[15], CPU.Registers.register[23], CPU.Registers.register[31]);
-    
+
     $fdisplay(outfile, "\n");
-    
+
     counter = counter + 1;
 end
 
-  
+
 endmodule
