@@ -8,6 +8,7 @@ module Control
 
 // Interface
 input [6:0] opcode;
+
 output [1:0] ALUOp;
 output ALUSrc;
 output RegWrite;
