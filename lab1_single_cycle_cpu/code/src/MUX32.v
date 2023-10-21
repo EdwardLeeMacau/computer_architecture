@@ -37,4 +37,8 @@ input [2:0] sel;
 
 output [31:0] out;
 
+// Implementation
+// FIXME: select proper input to out
+assign out = 0;
+
 endmodule

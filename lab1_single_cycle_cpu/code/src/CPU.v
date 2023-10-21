@@ -49,31 +49,54 @@ Adder Add_PC(
 );
 
 PC PC(
-    clk_i, rst_i, adder_out, pc_o
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+    .pc_i(adder_out),
+    .pc_o(pc_o)
 );
 
 Instruction_Memory Instruction_Memory(
-    pc_o, instruction
+    .addr_i(pc_o),
+    .instr_o(instruction)
 );
 
 Registers Registers(
-    rst_i, clk_i, instruction[19:15], instruction[24:20], instruction[11:7], ALUResult, RegWrite, RS1data, RS2data
+    .rst_i(rst_i),
+    .clk_i(clk_i),
+    .RS1addr_i(instruction[19:15]),
+    .RS2addr_i(instruction[24:20]),
+    .RDaddr_i(instruction[11:7]),
+    .RDdata_i(ALUResult),
+    .RegWrite_i(RegWrite),
+    .RS1data_o(RS1data),
+    .RS2data_o(RS2data)
 );
 
 MUX32 MUX_ALUSrc(
-    RS2data, imm_ext, ALUSrc, ALUin1
+    .in0(RS2data),
+    .in1(imm_ext),
+    .sel(ALUSrc),
+    .out(ALUin1)
 );
 
 Sign_Extend Sign_Extend(
-    instruction[31:20], imm_ext
+    .imm(instruction[31:20]),
+    .imm_ext(imm_ext)
 );
 
 ALU ALU(
-    RS1data, ALUin1, ALUControl_o, ALUZero, ALUResult
+    .in0(RS1data),
+    .in1(ALUin1),
+    .op(ALUControl_o),
+    .zero(ALUZero),
+    .out(ALUResult)
 );
 
 ALU_Control ALU_Control(
-    ALUOp, instruction[31:25], instruction[14:12], ALUControl_o
+    .ALUOp(ALUOp),
+    .funct7(instruction[31:25]),
+    .funct3(instruction[14:12]),
+    .ALUControl(ALUControl_o)
 );
 
 endmodule
