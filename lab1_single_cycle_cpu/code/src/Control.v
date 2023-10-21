@@ -21,7 +21,7 @@ output RegWrite;
 // RegWrite is always 1.
 
 // Implementation
-assign ALUOp = 0;
+assign ALUOp = opcode[5:4];
 assign ALUSrc = ~opcode[5];
 assign RegWrite = 1;
 
