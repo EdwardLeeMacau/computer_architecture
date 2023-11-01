@@ -8,3 +8,10 @@ cpu
 *.txt
 *.vcd
 
+# Generated files
+report.pdf
+
+# Pack files
+r11922001_lab1
+r11922001_lab1.zip
+
