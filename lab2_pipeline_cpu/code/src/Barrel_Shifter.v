@@ -6,9 +6,9 @@ module Barrel_Shifter
 );
 
 // Interface
-input [31:0] in;
-input [4:0] shamt;
-input [31:0] out;
+input  [31:0] in;
+input   [4:0] shamt;
+output [31:0] out;
 
 // Spec:
 // Barrel shifter is used to implement srai.

@@ -17,12 +17,12 @@ module ALU
 );
 
 // Interface
-input [31:0] in0;
-input [31:0] in1;
-input [2:0] op;
+input  [31:0]   in0;
+input  [31:0]   in1;
+input   [2:0]   op;
 
-output zero;
-output [31:0] out;
+output          zero;
+output [31:0]   out;
 
 // Implementation:
 //

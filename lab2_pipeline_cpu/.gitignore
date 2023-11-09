@@ -1,0 +1,17 @@
+# Environment
+peco
+
+# Build Target
+cpu
+
+# Dump files
+*.txt
+*.vcd
+
+# Generated files
+report.pdf
+
+# Pack files
+r11922001_lab2
+r11922001_lab2.zip
+

@@ -17,6 +17,8 @@ wire [31:0]         instruction;
 wire [1:0]          ALUOp;
 wire                ALUSrc;
 wire                RegWrite;
+wire                Branch_o;
+wire                ID_FlushIF;
 
 // SignExtend outputs
 wire [31:0]         imm_ext;
@@ -35,13 +37,6 @@ wire [2:0]          ALUControl_o;
 wire                ALUZero;
 wire [31:0]         ALUResult;
 
-Control Control(
-    .opcode(instruction[6:0]),
-    .ALUOp(ALUOp),
-    .ALUSrc(ALUSrc),
-    .RegWrite(RegWrite)
-);
-
 Adder Add_PC(
     .in0(pc_o),
     .in1(4),
@@ -59,6 +54,16 @@ Instruction_Memory Instruction_Memory(
     .addr_i(pc_o),
     .instr_o(instruction)
 );
+
+Control Control(
+    .opcode(instruction[6:0]),
+    .ALUOp(ALUOp),
+    .ALUSrc(ALUSrc),
+    .RegWrite(RegWrite),
+    .Branch_o(Branch_o)
+);
+
+assign ID_FlushIF = Branch_o & (RS1data == RS2data);
 
 Registers Registers(
     .rst_i(rst_i),
@@ -84,6 +89,13 @@ Sign_Extend Sign_Extend(
     .imm_ext(imm_ext)
 );
 
+ALU_Control ALU_Control(
+    .ALUOp(ALUOp),
+    .funct7(instruction[31:25]),
+    .funct3(instruction[14:12]),
+    .ALUControl(ALUControl_o)
+);
+
 ALU ALU(
     .in0(RS1data),
     .in1(ALUin1),
@@ -92,11 +104,28 @@ ALU ALU(
     .out(ALUResult)
 );
 
-ALU_Control ALU_Control(
-    .ALUOp(ALUOp),
-    .funct7(instruction[31:25]),
-    .funct3(instruction[14:12]),
-    .ALUControl(ALUControl_o)
+Data_Memory Data_Memory(
+
+);
+
+IF2ID_Register IF2ID_Register(
+
+);
+
+ID2EX_Register ID2EX_Register(
+
+);
+
+EX2MEM_Register EX2MEM_Register(
+
+);
+
+MEM2WB_Register MEM2WB_Register(
+
+);
+
+Forwarding Forwarding(
+
 );
 
 endmodule
