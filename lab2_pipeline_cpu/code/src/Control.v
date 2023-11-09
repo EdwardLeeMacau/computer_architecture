@@ -1,32 +1,44 @@
 module Control
 (
     opcode,
+    RegWrite,
+    MemtoReg,
+    MemRead,
+    MemWrite,
     ALUOp,
     ALUSrc,
-    RegWrite,
     Branch_o,
 );
 
 // Interface
-input [6:0] opcode;
+input  [6:0]    opcode;
 
-output [1:0] ALUOp;
-output ALUSrc;
-output RegWrite;
-output Branch_o;
+output          RegWrite;
+output          MemtoReg;
+output          MemRead;
+output          MemWrite;
+output [2:0]    ALUOp;
+output          ALUSrc;
+output          Branch_o;
 
 // Spec:
-// Only 0b'0110011 (R-type) or 0b'0010011 (I-type) is expected to be used in this lab.
 //
-// ALUOp: not specified
-// ALUSrc is determined by opcode[5].
-// RegWrite: TODO.
-// Branch_o: TODO
+// RegWrite (    ): x00xxxx, x01xxxx, x11xxxx
+// MemtoReg ( lw ): x00xxxx
+//  MemRead ( lw ): x00xxxx
+// MemWrite ( sw ): 010xxxx
+//    ALUOp (    ):
+//   ALUSrc (    ): x00xxxx, x01xxxx, x10xxxx
+// Branch_o (    ): 1xxxxxx
 
-// TODO: Implementation
-assign ALUOp = opcode[5:4];
-assign ALUSrc = ~opcode[5];
-assign RegWrite = 1;
-assign Branch_o = 0;
+wire    PowerOn = opcode[1] & opcode[0];
+
+assign RegWrite = (~PowerOn) ? 0 :              ~opcode[5] |  opcode[4];
+assign MemtoReg = (~PowerOn) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
+assign  MemRead = (~PowerOn) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
+assign MemWrite = (~PowerOn) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
+assign    ALUOp = (~PowerOn) ? 0 : opcode[6:4];
+assign   ALUSrc = (~PowerOn) ? 0 :              ~opcode[5] | ~opcode[4];
+assign Branch_o = (~PowerOn) ? 0 :  opcode[6];
 
 endmodule

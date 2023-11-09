@@ -1,7 +1,7 @@
 `define OP_ADD 3'b000
 `define OP_SUB 3'b001
 `define OP_MUL 3'b010
-`define OP_DIV 3'b011
+`define OP_NOP 3'b011
 `define OP_AND 3'b100
 `define OP_XOR 3'b101
 `define OP_SLL 3'b110
@@ -44,7 +44,7 @@ always @(in0 or in1 or op or srai_o) begin
         `OP_ADD: y = in0 + in1;
         `OP_SUB: y = in0 - in1;
         `OP_MUL: y = in0 * in1;
-        `OP_DIV: y = 32'bx;
+        `OP_NOP: y = 32'b0;
         `OP_AND: y = in0 & in1;
         `OP_XOR: y = in0 ^ in1;
         `OP_SLL: y = in0 << in1;

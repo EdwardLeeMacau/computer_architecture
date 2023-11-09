@@ -11,31 +11,19 @@ input               rst_i;
 // Wires
 wire [31:0]         adder_out;
 wire [31:0]         pc_o;
-wire [31:0]         instruction;
 
 // Control outputs
-wire [1:0]          ALUOp;
-wire                ALUSrc;
-wire                RegWrite;
-wire                Branch_o;
 wire                ID_FlushIF;
 
-// SignExtend outputs
-wire [31:0]         imm_ext;
-
 // Register outputs
-wire [31:0]         RS1data;
 wire [31:0]         RS2data;
 
-// Muxer outputs
-wire [31:0]         ALUin1;
+// Wire outputs
+wire [31:0]         WB_data;
 
-// ALU_Control outputs
-wire [2:0]          ALUControl_o;
-
-// ALU outputs
-wire                ALUZero;
-wire [31:0]         ALUResult;
+// =============================================================================
+// Instruction Fetch
+// =============================================================================
 
 Adder Add_PC(
     .in0(pc_o),
@@ -46,83 +34,127 @@ Adder Add_PC(
 PC PC(
     .clk_i(clk_i),
     .rst_i(rst_i),
+    .PCWrite_i(1'b1),
     .pc_i(adder_out),
     .pc_o(pc_o)
 );
 
 Instruction_Memory Instruction_Memory(
-    .addr_i(pc_o),
-    .instr_o(instruction)
+    .addr_i(pc_o)
 );
+
+IF2ID_Register RegID(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+
+    .pc_i(pc_o),
+    .instruction_i(Instruction_Memory.instr_o)
+);
+
+// =============================================================================
+// Instruction Decode
+// =============================================================================
 
 Control Control(
-    .opcode(instruction[6:0]),
-    .ALUOp(ALUOp),
-    .ALUSrc(ALUSrc),
-    .RegWrite(RegWrite),
-    .Branch_o(Branch_o)
+    .opcode(RegID.instruction_o[6:0])
 );
-
-assign ID_FlushIF = Branch_o & (RS1data == RS2data);
 
 Registers Registers(
     .rst_i(rst_i),
     .clk_i(clk_i),
-    .RS1addr_i(instruction[19:15]),
-    .RS2addr_i(instruction[24:20]),
-    .RDaddr_i(instruction[11:7]),
-    .RDdata_i(ALUResult),
-    .RegWrite_i(RegWrite),
-    .RS1data_o(RS1data),
-    .RS2data_o(RS2data)
+    .RS1addr_i(RegID.instruction_o[19:15]),
+    .RS2addr_i(RegID.instruction_o[24:20]),
+    .RDaddr_i(RegWB.RD_o),
+    .RDdata_i(WB_data),
+    .RegWrite_i(RegWB.RegWrite_o)
 );
+
+assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == RS2data);
+
+// TODO: Modification
+Sign_Extend Sign_Extend(
+    .instruction(RegID.instruction_o)
+);
+
+ID2EX_Register RegEX(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+
+    .RegWrite_i(Control.RegWrite),
+    .MemtoReg_i(Control.MemtoReg),
+    .MemRead_i(Control.MemRead),
+    .MemWrite_i(Control.MemWrite),
+    .ALUOp_i(Control.ALUOp),
+    .ALUSrc_i(Control.ALUSrc),
+    .RS1data_i(Registers.RS1data_o),
+    .RS2data_i(Registers.RS2data_o),
+    .instruction_i(RegID.instruction_o),
+    .imm_ext_i(Sign_Extend.imm_ext)
+);
+
+// =============================================================================
+// Execute
+// =============================================================================
 
 MUX32 MUX_ALUSrc(
-    .in0(RS2data),
-    .in1(imm_ext),
-    .sel(ALUSrc),
-    .out(ALUin1)
-);
-
-Sign_Extend Sign_Extend(
-    .imm(instruction[31:20]),
-    .imm_ext(imm_ext)
+    .in0(RegEX.RS2data),
+    .in1(RegEX.imm_ext_o),
+    .sel(RegEX.ALUSrc_o)
 );
 
 ALU_Control ALU_Control(
-    .ALUOp(ALUOp),
-    .funct7(instruction[31:25]),
-    .funct3(instruction[14:12]),
-    .ALUControl(ALUControl_o)
+    .ALUOp(RegEX.ALUOp),
+    .funct7(RegEX.instruction_o[31:25]),
+    .funct3(RegEX.instruction_o[14:12])
 );
 
 ALU ALU(
-    .in0(RS1data),
-    .in1(ALUin1),
-    .op(ALUControl_o),
-    .zero(ALUZero),
-    .out(ALUResult)
+    .in0(RegEX.RS1data_o),
+    .in1(MUX_ALUSrc.out),
+    .op(ALU_Control.out)
 );
+
+EX2MEM_Register RegMEM(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+
+    .RegWrite_i(RegEX.RegWrite_o),
+    .MemtoReg_i(RegEX.MemtoReg_o),
+    .MemRead_i(RegEX.MemRead_o),
+    .MemWrite_i(RegEX.MemWrite_o),
+    .ALUResult_i(ALU.out),
+    .RS2data_i(RegEX.RS2data_o),
+    .RD_i(RegEX.instruction_o[11:7])
+);
+
+// =============================================================================
+// Memory Access
+// =============================================================================
 
 Data_Memory Data_Memory(
-
+    .clk_i(clk_i),
+    .addr_i(RegMEM.ALUResult_o),
+    .MemRead_i(RegMEM.MemRead_o),
+    .MemWrite_i(RegMEM.MemWrite_o),
+    .data_i(RegMEM.RS2data_o)
 );
 
-IF2ID_Register IF2ID_Register(
+MEM2WB_Register RegWB(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
 
+    .RegWrite_i(RegMEM.RegWrite_o),
+    .MemtoReg_i(RegMEM.MemtoReg_o),
+    .ALUResult_i(RegMEM.ALUResult_o),
+    .ReadData_i(Data_Memory.data_o),
+    .RD_i(RegMEM.RD_o)
 );
 
-ID2EX_Register ID2EX_Register(
+// =============================================================================
+// Write Back
+// =============================================================================
 
-);
-
-EX2MEM_Register EX2MEM_Register(
-
-);
-
-MEM2WB_Register MEM2WB_Register(
-
-);
+assign WB_data = (RegWB.MemtoReg_o) ? RegWB.ReadData_o : RegWB.ALUResult_o;
 
 Forwarding Forwarding(
 
