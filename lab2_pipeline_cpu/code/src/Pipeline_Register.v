@@ -33,7 +33,7 @@ assign pc_o = pc;
 
 always@(posedge clk_i or negedge rst_i) begin
     if (~stall) begin
-        if (~rst_i) begin
+        if (~rst_i | flush) begin
             instruction <= 32'b0;
             pc <= 32'b0;
         end
