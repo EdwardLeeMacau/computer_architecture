@@ -1,27 +1,27 @@
 module Hazard_Detection
 (
-    // EX2MEM_RegWrite,
-    // EX2MEM_Rd,
-    // MEM2WB_RegWrite,
-    // MEM2WB_Rd,
-    // ID2EX_MemRead,
-    // ID2EX_Rs1,
-    // ID2EX_Rs2,
-    // ID2EX_RegWrite,
-    // ID2EX_Rd,
+    ID_Rs1,
+    ID_Rs2,
+    EX_Rd,
+    EX_MemRead,
     PCWrite,
     Stall_o,
     NoOp
 );
 
 // Interface
-output PCWrite;
-output Stall_o;
-output NoOp;
+input  [4:0]    ID_Rs1;
+input  [4:0]    ID_Rs2;
+input  [4:0]    EX_Rd;
+input           EX_MemRead;
 
-// TODO: Implementation
-assign PCWrite = 1'b0;
-assign Stall = 1'b0;
-assign NoOp = 1'b0;
+output          PCWrite;
+output          Stall_o;
+output          NoOp;
+
+// Implementation
+assign Stall_o = (EX_MemRead && (EX_Rd == ID_Rs1) | (EX_Rd == ID_Rs2));
+assign PCWrite = ~Stall_o;
+assign    NoOp = Stall_o;
 
 endmodule

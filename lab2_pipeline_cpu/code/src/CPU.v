@@ -34,7 +34,7 @@ Adder Add_PC(
 PC PC(
     .clk_i(clk_i),
     .rst_i(rst_i),
-    .PCWrite_i(1'b1),
+    .PCWrite_i(Hazard_Detection.PCWrite),
     .pc_i(adder_out),
     .pc_o(pc_o)
 );
@@ -48,6 +48,7 @@ IF2ID_Register RegID(
     .rst_i(rst_i),
 
     .pc_i(pc_o),
+    .stall(Hazard_Detection.Stall_o),
     .instruction_i(Instruction_Memory.instr_o)
 );
 
@@ -55,8 +56,16 @@ IF2ID_Register RegID(
 // Instruction Decode
 // =============================================================================
 
+Hazard_Detection Hazard_Detection(
+    .ID_Rs1(RegID.instruction_o[19:15]),
+    .ID_Rs2(RegID.instruction_o[24:20]),
+    .EX_Rd(RegEX.instruction_o[11:7]),
+    .EX_MemRead(RegEX.MemRead_o)
+);
+
 Control Control(
-    .opcode(RegID.instruction_o[6:0])
+    .opcode(RegID.instruction_o[6:0]),
+    .nop(Hazard_Detection.NoOp)
 );
 
 Registers Registers(

@@ -1,6 +1,7 @@
 module Control
 (
     opcode,
+    nop,
     RegWrite,
     MemtoReg,
     MemRead,
@@ -12,6 +13,7 @@ module Control
 
 // Interface
 input  [6:0]    opcode;
+input           nop;
 
 output          RegWrite;
 output          MemtoReg;
@@ -33,12 +35,12 @@ output          Branch_o;
 
 wire    PowerOn = opcode[1] & opcode[0];
 
-assign RegWrite = (~PowerOn) ? 0 :              ~opcode[5] |  opcode[4];
-assign MemtoReg = (~PowerOn) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
-assign  MemRead = (~PowerOn) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
-assign MemWrite = (~PowerOn) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
-assign    ALUOp = (~PowerOn) ? 0 : opcode[6:4];
-assign   ALUSrc = (~PowerOn) ? 0 :              ~opcode[5] | ~opcode[4];
-assign Branch_o = (~PowerOn) ? 0 :  opcode[6];
+assign RegWrite = (~PowerOn | nop) ? 0 :              ~opcode[5] |  opcode[4];
+assign MemtoReg = (~PowerOn | nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
+assign  MemRead = (~PowerOn | nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
+assign MemWrite = (~PowerOn | nop) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
+assign    ALUOp = (~PowerOn | nop) ? 0 : opcode[6:4];
+assign   ALUSrc = (~PowerOn | nop) ? 0 :              ~opcode[5] | ~opcode[4];
+assign Branch_o = (~PowerOn | nop) ? 0 :  opcode[6];
 
 endmodule
