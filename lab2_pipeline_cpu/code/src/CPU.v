@@ -8,15 +8,14 @@ module CPU
 input               clk_i;
 input               rst_i;
 
-// Wires
-wire [31:0]         adder_out;
-wire [31:0]         pc_o;
-
-// Control outputs
+// Program Counter
 wire                ID_FlushIF;
+wire [31:0]         nextPC;
 
-// Register outputs
-wire [31:0]         RS2data;
+// ALU
+wire [31:0]         in0;
+wire [31:0]         in1;
+wire [31:0]         fw1;
 
 // Wire outputs
 wire [31:0]         WB_data;
@@ -25,30 +24,27 @@ wire [31:0]         WB_data;
 // Instruction Fetch
 // =============================================================================
 
-Adder Add_PC(
-    .in0(pc_o),
-    .in1(4),
-    .out(adder_out)
-);
+assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == Registers.RS2data_o);
+assign nextPC = (ID_FlushIF) ? (RegID.pc_o + Sign_Extend.imm_ext) : (PC.pc_o + 4);
 
 PC PC(
     .clk_i(clk_i),
     .rst_i(rst_i),
     .PCWrite_i(Hazard_Detection.PCWrite),
-    .pc_i(adder_out),
-    .pc_o(pc_o)
+    .pc_i(nextPC)
 );
 
 Instruction_Memory Instruction_Memory(
-    .addr_i(pc_o)
+    .addr_i(PC.pc_o)
 );
 
 IF2ID_Register RegID(
     .clk_i(clk_i),
     .rst_i(rst_i),
 
-    .pc_i(pc_o),
+    .pc_i(PC.pc_o),
     .stall(Hazard_Detection.Stall_o),
+    .flush(ID_FlushIF),
     .instruction_i(Instruction_Memory.instr_o)
 );
 
@@ -78,9 +74,6 @@ Registers Registers(
     .RegWrite_i(RegWB.RegWrite_o)
 );
 
-assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == RS2data);
-
-// TODO: Modification
 Sign_Extend Sign_Extend(
     .instruction(RegID.instruction_o)
 );
@@ -119,10 +112,6 @@ ALU_Control ALU_Control(
     .funct7(RegEX.instruction_o[31:25]),
     .funct3(RegEX.instruction_o[14:12])
 );
-
-wire [31:0] in0;
-wire [31:0] fw1;
-wire [31:0] in1;
 
 assign in0 = (Forwarding.ForwardA == 2'b00) ? RegEX.RS1data_o :
              (Forwarding.ForwardA == 2'b01) ? WB_data :

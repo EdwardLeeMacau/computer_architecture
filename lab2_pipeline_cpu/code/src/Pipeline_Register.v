@@ -5,6 +5,7 @@ module IF2ID_Register
 
     pc_i,
     stall,
+    flush,
     instruction_i,
 
     pc_o,
@@ -16,6 +17,7 @@ input               clk_i;
 input               rst_i;
 input  [31:0]       instruction_i;
 input               stall;
+input               flush;
 input  [31:0]       pc_i;
 
 output [31:0]       instruction_o;
