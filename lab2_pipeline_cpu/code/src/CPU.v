@@ -96,10 +96,13 @@ ID2EX_Register RegEX(
 // Execute
 // =============================================================================
 
-MUX32 MUX_ALUSrc(
-    .in0(RegEX.RS2data),
-    .in1(RegEX.imm_ext_o),
-    .sel(RegEX.ALUSrc_o)
+Forwarding Forwarding(
+    .EX_Rs1(RegEX.instruction_o[19:15]),
+    .EX_Rs2(RegEX.instruction_o[24:20]),
+    .MEM_RegWrite(RegMEM.RegWrite_o),
+    .MEM_Rd(RegMEM.RD_o),
+    .WB_RegWrite(RegWB.RegWrite_o),
+    .WB_Rd(RegWB.RD_o)
 );
 
 ALU_Control ALU_Control(
@@ -108,9 +111,24 @@ ALU_Control ALU_Control(
     .funct3(RegEX.instruction_o[14:12])
 );
 
+wire [31:0] in0;
+wire [31:0] fw1;
+wire [31:0] in1;
+
+assign in0 = (Forwarding.ForwardA == 2'b00) ? RegEX.RS1data_o :
+             (Forwarding.ForwardA == 2'b01) ? WB_data :
+             (Forwarding.ForwardA == 2'b10) ? RegMEM.ALUResult_o :
+             32'h0;
+
+assign fw1 = (Forwarding.ForwardB == 2'b00) ? RegEX.RS2data_o :
+             (Forwarding.ForwardB == 2'b01) ? WB_data :
+             (Forwarding.ForwardB == 2'b10) ? RegMEM.ALUResult_o :
+             32'h0;
+assign in1 = (RegEX.ALUSrc_o == 1'b1) ? RegEX.imm_ext_o : fw1;
+
 ALU ALU(
-    .in0(RegEX.RS1data_o),
-    .in1(MUX_ALUSrc.out),
+    .in0(in0),
+    .in1(in1),
     .op(ALU_Control.out)
 );
 
@@ -123,7 +141,7 @@ EX2MEM_Register RegMEM(
     .MemRead_i(RegEX.MemRead_o),
     .MemWrite_i(RegEX.MemWrite_o),
     .ALUResult_i(ALU.out),
-    .RS2data_i(RegEX.RS2data_o),
+    .RS2data_i(fw1),
     .RD_i(RegEX.instruction_o[11:7])
 );
 
@@ -155,10 +173,6 @@ MEM2WB_Register RegWB(
 // =============================================================================
 
 assign WB_data = (RegWB.MemtoReg_o) ? RegWB.ReadData_o : RegWB.ALUResult_o;
-
-Forwarding Forwarding(
-
-);
 
 endmodule
 

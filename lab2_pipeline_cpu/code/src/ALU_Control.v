@@ -57,8 +57,8 @@ always @ (x) begin
         13'b0000001000011: assign y = `OP_MUL;
         13'b0000000011111: assign y = `OP_AND;
         13'b0000000010011: assign y = `OP_XOR;
-        13'b0000000000111: assign y = `OP_SLL;
-        13'b0100000010101: assign y = `OP_SRA;
+        13'b0000000001011: assign y = `OP_SLL;
+        13'b0100000101001: assign y = `OP_SRA;
         default:           assign y = `OP_NOP;
     endcase
 end
