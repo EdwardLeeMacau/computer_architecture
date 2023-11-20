@@ -33,14 +33,14 @@ output          Branch_o;
 //   ALUSrc (    ): x00xxxx, x01xxxx, x10xxxx
 // Branch_o (    ): 1xxxxxx
 
-wire    PowerOn = opcode[1] & opcode[0];
+// wire    PowerOn = opcode[1] & opcode[0];
 
-assign RegWrite = (~PowerOn | nop) ? 0 :              ~opcode[5] |  opcode[4];
-assign MemtoReg = (~PowerOn | nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
-assign  MemRead = (~PowerOn | nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
-assign MemWrite = (~PowerOn | nop) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
-assign    ALUOp = (~PowerOn | nop) ? 0 : opcode[6:4];
-assign   ALUSrc = (~PowerOn | nop) ? 0 :              ~opcode[5] | ~opcode[4];
-assign Branch_o = (~PowerOn | nop) ? 0 :  opcode[6];
+assign RegWrite = (nop) ? 0 :              ~opcode[5] |  opcode[4];
+assign MemtoReg = (nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
+assign  MemRead = (nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4] & opcode[0];
+assign MemWrite = (nop) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
+assign    ALUOp = (nop) ? 0 : opcode[6:4];
+assign   ALUSrc = (nop) ? 0 :              ~opcode[5] | ~opcode[4];
+assign Branch_o = (nop) ? 0 :  opcode[6];
 
 endmodule
