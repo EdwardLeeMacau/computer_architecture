@@ -29,7 +29,7 @@ all: default
 ################################################################################
 
 SOURCE_DIR := code/src
-TARGET_DIR := r11922001_lab1
+TARGET_DIR := r11922001_lab2
 
 SOURCES := $(wildcard $(SOURCE_DIR)/*.v)
 TARGETS := $(addprefix $(TARGET_DIR)/src/, $(notdir $(SOURCES))) \
@@ -43,7 +43,7 @@ $(TARGET_DIR)/src/% : code/src/% | $(TARGET_DIR)/src
 	@echo "Copying $@ ..."
 	$(Q)$(COPY) $< $@
 
-r11922001_lab1.zip: $(TARGETS)
+r11922001_lab2.zip: $(TARGETS)
 	@echo "Packing source code ..."
 	@echo "$(SOURCES)"
 	@echo "$(TARGETS)"
@@ -66,14 +66,14 @@ default: pack
 test: ;
 
 .PHONY: pack
-pack: r11922001_lab1.zip
+pack: r11922001_lab2.zip
 	$(Q)$(ZIPINFO) $<
 
 .PHONY: clean
 clean:
 	@echo "Cleaning up ..."
 	@echo ""
-	$(Q)$(RM) -rf r11922001_lab1 r11922001_lab1.zip
+	$(Q)$(RM) -rf r11922001_lab2 r11922001_lab2.zip
 
 .PHONY: help
 help:
