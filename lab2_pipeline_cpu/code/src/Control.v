@@ -26,7 +26,7 @@ module Control
 
 assign RegWrite = (nop) ? 0 :              ~opcode[5] |  opcode[4];
 assign MemtoReg = (nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4];
-assign  MemRead = (nop) ? 0 : ~opcode[6] & ~opcode[5] & ~opcode[4] & opcode[0];
+assign  MemRead = (nop) ? 0 :              ~opcode[5] & ~opcode[4] & opcode[0];
 assign MemWrite = (nop) ? 0 : ~opcode[6] &  opcode[5] & ~opcode[4];
 assign    ALUOp = (nop) ? 0 : opcode[6:4];
 assign   ALUSrc = (nop) ? 0 :              ~opcode[5] | ~opcode[4];

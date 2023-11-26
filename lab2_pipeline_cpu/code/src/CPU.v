@@ -25,7 +25,7 @@ wire [31:0]         WB_data;
 // =============================================================================
 
 assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == Registers.RS2data_o);
-assign     nextPC = (ID_FlushIF) ? (RegID.pc_o + Sign_Extend.imm_ext) : (PC.pc_o + 4);
+assign     nextPC = (ID_FlushIF) ? (RegID.pc_o + ImmGen.out) : (PC.pc_o + 4);
 
 PC PC(
     .clk_i(clk_i),
@@ -74,7 +74,7 @@ Registers Registers(
     .RegWrite_i(RegWB.RegWrite_o)
 );
 
-Sign_Extend Sign_Extend(
+ImmGen ImmGen(
     .instruction(RegID.instruction_o)
 );
 
@@ -91,7 +91,7 @@ ID2EX_Register RegEX(
     .RS1data_i(Registers.RS1data_o),
     .RS2data_i(Registers.RS2data_o),
     .instruction_i(RegID.instruction_o),
-    .imm_ext_i(Sign_Extend.imm_ext)
+    .imm_ext_i(ImmGen.out)
 );
 
 // =============================================================================
