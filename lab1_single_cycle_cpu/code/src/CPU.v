@@ -33,7 +33,7 @@ wire [2:0]          ALUControl_o;
 
 // ALU outputs
 wire                ALUZero;
-wire [31:0]         ALUResult;
+wire signed [31:0]  ALUResult;
 
 Control Control(
     .opcode(instruction[6:0]),

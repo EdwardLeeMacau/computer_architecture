@@ -33,9 +33,9 @@ TARGET_DIR := r11922001_lab2
 
 SOURCES := $(wildcard $(SOURCE_DIR)/*.v)
 TARGETS := $(addprefix $(TARGET_DIR)/src/, $(notdir $(SOURCES))) \
-		   $(TARGET_DIR)/r11922001_lab1_report.pdf
+		   $(TARGET_DIR)/r11922001_lab2_report.pdf
 
-$(TARGET_DIR)/r11922001_lab1_report.pdf: report.pdf
+$(TARGET_DIR)/r11922001_lab2_report.pdf: report.pdf
 	@echo "Copying $@ ..."
 	$(Q)$(COPY) $< $@
 
