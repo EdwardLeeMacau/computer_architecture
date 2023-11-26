@@ -9,50 +9,26 @@
 
 module ALU
 (
-    in0,
-    in1,
-    op,
-    zero,
-    out
+    input  signed [31:0]   in0,
+    input  signed [31:0]   in1,
+    input  signed  [2:0]   op,
+
+    output                 zero,
+    output signed [31:0]   out
 );
 
-// Interface
-input  [31:0]   in0;
-input  [31:0]   in1;
-input   [2:0]   op;
-
-output          zero;
-output [31:0]   out;
-
-// Implementation:
-//
-// ALU designed by case statement
-// Reference: https://programmermagazine.github.io/201310/htm/article4.html
 wire [4:0] imm;
-wire [31:0] srai_o;
 assign imm = in1[4:0];              // for srai
+assign out = (op == `OP_ADD) ? in0 + in1 :
+             (op == `OP_SUB) ? in0 - in1 :
+             (op == `OP_MUL) ? in0 * in1 :
+             (op == `OP_NOP) ? 32'b0 :
+             (op == `OP_AND) ? in0 & in1 :
+             (op == `OP_XOR) ? in0 ^ in1 :
+             (op == `OP_SLL) ? in0 << in1 :
+             (op == `OP_SRA) ? $signed(in0) >>> imm :
+                               32'b0;
 
-Barrel_Shifter shifter(
-    .in(in0),
-    .shamt(imm),
-    .out(srai_o)
-);
-
-reg [31:0] y;
-always @(in0 or in1 or op or srai_o) begin
-    case (op)
-        `OP_ADD: y = in0 + in1;
-        `OP_SUB: y = in0 - in1;
-        `OP_MUL: y = in0 * in1;
-        `OP_NOP: y = 32'b0;
-        `OP_AND: y = in0 & in1;
-        `OP_XOR: y = in0 ^ in1;
-        `OP_SLL: y = in0 << in1;
-        `OP_SRA: y = srai_o;
-    endcase
-end
-
-assign out = y;
 assign zero = (out == 0);
 
 endmodule

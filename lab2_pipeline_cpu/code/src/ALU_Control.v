@@ -8,21 +8,6 @@
 `define OP_SLL 3'b110
 `define OP_SRA 3'b111
 
-module ALU_Control
-(
-    ALUOp,
-    funct7,
-    funct3,
-    out
-);
-
-// Interface
-input  [2:0] ALUOp;
-input  [6:0] funct7;
-input  [2:0] funct3;
-
-output [2:0] out;
-
 // Spec:
 // ALUControl is determined by ALUOp and funct7 and funct3.
 //
@@ -40,6 +25,14 @@ output [2:0] out;
 // | 0000001  |  000   |  011  | 0000001000011 |    mul   |
 // |    -     |  000   |  110  | ???????000110 |    beq   |
 
+module ALU_Control
+(
+    input  [2:0] ALUOp,
+    input  [6:0] funct7,
+    input  [2:0] funct3,
+
+    output [2:0] out
+);
 
 // Implementation
 // Concatenate funct7, funct3 and ALUOp to determine ALUControl

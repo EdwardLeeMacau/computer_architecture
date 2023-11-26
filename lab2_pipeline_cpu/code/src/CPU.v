@@ -25,7 +25,7 @@ wire [31:0]         WB_data;
 // =============================================================================
 
 assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == Registers.RS2data_o);
-assign nextPC = (ID_FlushIF) ? (RegID.pc_o + Sign_Extend.imm_ext) : (PC.pc_o + 4);
+assign     nextPC = (ID_FlushIF) ? (RegID.pc_o + Sign_Extend.imm_ext) : (PC.pc_o + 4);
 
 PC PC(
     .clk_i(clk_i),

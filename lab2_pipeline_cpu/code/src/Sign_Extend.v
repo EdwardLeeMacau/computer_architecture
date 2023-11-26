@@ -1,12 +1,8 @@
 module Sign_Extend
 (
-    instruction,
-    imm_ext
+    input  [31:0]       instruction,
+    output [31:0]       imm_ext,
 );
-
-// Interface
-input  [31:0]       instruction;
-output [31:0]       imm_ext;
 
 wire   [12:0]       imm;
 
@@ -15,7 +11,7 @@ wire                BType;
 
 assign SType = (instruction[6:0] == 7'b0100011);
 assign BType = (instruction[6:0] == 7'b1100011);
-// R-Type: otherwise
+//     RType : otherwise
 
 assign imm = (BType) ? {instruction[31], instruction[7], instruction[30:25], instruction[11:8], 1'b0} :
              (SType) ? {instruction[31], instruction[31:25], instruction[11:7]} :

@@ -1,56 +1,30 @@
 module ID2EX_Register
 (
-    clk_i,
-    rst_i,
+    input               clk_i,
+    input               rst_i,
 
-    RegWrite_i,
-    MemtoReg_i,
-    MemRead_i,
-    MemWrite_i,
-    ALUOp_i,
-    ALUSrc_i,
-    RS1data_i,
-    RS2data_i,
-    instruction_i,
-    imm_ext_i,
+    input               RegWrite_i,
+    input               MemtoReg_i,
+    input               MemRead_i,
+    input               MemWrite_i,
+    input  [2:0]        ALUOp_i,
+    input               ALUSrc_i,
+    input  [31:0]       RS1data_i,
+    input  [31:0]       RS2data_i,
+    input  [31:0]       instruction_i,
+    input  [31:0]       imm_ext_i,
 
-    RegWrite_o,
-    MemtoReg_o,
-    MemRead_o,
-    MemWrite_o,
-    ALUOp_o,
-    ALUSrc_o,
-    RS1data_o,
-    RS2data_o,
-    instruction_o,
-    imm_ext_o,
+    output              RegWrite_o,
+    output              MemtoReg_o,
+    output              MemRead_o,
+    output              MemWrite_o,
+    output [2:0]        ALUOp_o,
+    output              ALUSrc_o,
+    output [31:0]       RS1data_o,
+    output [31:0]       RS2data_o,
+    output [31:0]       instruction_o,
+    output [31:0]       imm_ext_o
 );
-
-// Interface
-input               clk_i;
-input               rst_i;
-
-input               RegWrite_i;
-input               MemtoReg_i;
-input               MemRead_i;
-input               MemWrite_i;
-input  [2:0]        ALUOp_i;
-input               ALUSrc_i;
-input  [31:0]       RS1data_i;
-input  [31:0]       RS2data_i;
-input  [31:0]       instruction_i;
-input  [31:0]       imm_ext_i;
-
-output              RegWrite_o;
-output              MemtoReg_o;
-output              MemRead_o;
-output              MemWrite_o;
-output [2:0]        ALUOp_o;
-output              ALUSrc_o;
-output [31:0]       RS1data_o;
-output [31:0]       RS2data_o;
-output [31:0]       instruction_o;
-output [31:0]       imm_ext_o;
 
 // Register File
 reg                 RegWrite = 1'b0;

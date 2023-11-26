@@ -1,27 +1,15 @@
 module IF2ID_Register
 (
-    clk_i,
-    rst_i,
+    input               clk_i,
+    input               rst_i,
+    input  [31:0]       instruction_i,
+    input               stall,
+    input               flush,
+    input  [31:0]       pc_i,
 
-    pc_i,
-    stall,
-    flush,
-    instruction_i,
-
-    pc_o,
-    instruction_o
+    output [31:0]       instruction_o,
+    output [31:0]       pc_o
 );
-
-// Interface
-input               clk_i;
-input               rst_i;
-input  [31:0]       instruction_i;
-input               stall;
-input               flush;
-input  [31:0]       pc_i;
-
-output [31:0]       instruction_o;
-output [31:0]       pc_o;
 
 // Register File
 reg    [31:0]       instruction = 32'b0;
