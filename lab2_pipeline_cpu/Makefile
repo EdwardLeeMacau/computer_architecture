@@ -47,6 +47,7 @@ r11922001_lab2.zip: $(TARGETS)
 	@echo "Packing source code ..."
 	@echo "$(SOURCES)"
 	@echo "$(TARGETS)"
+	$(Q)$(RM) -rf $@
 	$(Q)$(ZIP) -r $@ $(TARGET_DIR)
 
 $(TARGET_DIR)/src: $(TARGET_DIR)
