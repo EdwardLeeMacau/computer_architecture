@@ -14,7 +14,7 @@ module ALU
     input  signed  [2:0]   op,
 
     output                 zero,
-    output signed [31:0]   data_o
+    output        [31:0]   data_o
 );
 
 wire [4:0] imm;

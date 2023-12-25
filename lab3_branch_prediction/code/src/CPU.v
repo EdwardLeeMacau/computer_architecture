@@ -9,8 +9,8 @@ input               clk_i;
 input               rst_i;
 
 // Program Counter
-wire                ID_FlushIF;
 wire [31:0]         nextPC;
+wire                pc_sel;
 
 // ALU
 wire [31:0]         in0;
@@ -24,8 +24,8 @@ wire [31:0]         WB_data;
 // Instruction Fetch
 // =============================================================================
 
-assign ID_FlushIF = Control.Branch_o & (Registers.RS1data_o == Registers.RS2data_o);
-assign     nextPC = (ID_FlushIF) ? (IF_ID.pc_o + ImmGen.out) : (PC.pc_o + 4);
+assign pc_sel = (Control.Branch_o & branch_predictor.predict_o) | branch_predictor.mispredict;
+assign nextPC = pc_sel ? branch_predictor.dest_o : (PC.pc_o + 4);
 
 PC PC(
     .clk_i(clk_i),
@@ -44,7 +44,7 @@ IF2ID_Register IF_ID(
 
     .pc_i(PC.pc_o),
     .stall(Hazard_Detection.Stall_o),
-    .flush_i(ID_FlushIF),
+    .flush_i(branch_predictor.flush_IF_ID_o),
     .instruction_i(Instruction_Memory.instr_o)
 );
 
@@ -78,6 +78,15 @@ ImmGen ImmGen(
     .instruction(IF_ID.instruction_o)
 );
 
+Branch_Predictor branch_predictor(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+    .branch_i(Control.Branch_o),
+    .equal_i(ALU.zero),
+    .pc_i(IF_ID.pc_o),
+    .imm(ImmGen.out)
+);
+
 ID2EX_Register ID_EX(
     .clk_i(clk_i),
     .rst_i(rst_i),
@@ -88,10 +97,12 @@ ID2EX_Register ID_EX(
     .MemWrite_i(Control.MemWrite),
     .ALUOp_i(Control.ALUOp),
     .ALUSrc_i(Control.ALUSrc),
+    .Branch_i(Control.Branch_o),
     .RS1data_i(Registers.RS1data_o),
     .RS2data_i(Registers.RS2data_o),
     .instruction_i(IF_ID.instruction_o),
-    .imm_ext_i(ImmGen.out)
+    .imm_ext_i(ImmGen.out),
+    .flush_i(branch_predictor.flush_ID_EX_o)
 );
 
 // =============================================================================
@@ -171,14 +182,6 @@ MEM2WB_Register MEM_WB(
 // =============================================================================
 
 assign WB_data = (MEM_WB.MemtoReg_o) ? MEM_WB.ReadData_o : MEM_WB.ALUResult_o;
-
-// =============================================================================
-// Branch Predictor
-// =============================================================================
-
-Branch_Predictor branch_predictor(
-
-);
 
 endmodule
 

@@ -47,6 +47,7 @@ always @ (x) begin
         13'b???????010010: assign y = `OP_ADD;  // sw
         13'b0000000000011: assign y = `OP_ADD;  // add
         13'b0100000000011: assign y = `OP_SUB;
+        13'b???????000110: assign y = `OP_SUB;  // beq
         13'b0000001000011: assign y = `OP_MUL;
         13'b0000000011111: assign y = `OP_AND;
         13'b0000000010011: assign y = `OP_XOR;
